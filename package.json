@@ -1,0 +1,17 @@
+{
+  "name": "frame-master-plugin-react-streaming",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "index.ts",
+  "peerDependencies": {
+    "frame-master": "^3.1.1",
+    "typescript": "^5",
+    "react-dom": ">=18.2.0"
+  },
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3"
+  }
+}
