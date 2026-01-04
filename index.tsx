@@ -53,6 +53,34 @@ export default function ReactStreamingPlugin(
   return {
     name,
     version,
+    runtimePlugins: [
+      {
+        name: "react-streaming-runtime-original-file-importer",
+        setup(build) {
+          build.onResolve(
+            { filter: /^react-streaming-original-file:.*/ },
+            (args) => {
+              return {
+                path: args.path,
+                namespace: "react-streaming-original-file",
+              };
+            }
+          );
+          build.onLoad(
+            { filter: /.*/, namespace: "react-streaming-original-file" },
+            async (args) => {
+              const originalPath = args.path
+                .replace(/^react-streaming-original-file:/, "")
+                .split("?v=")
+                .at(0)!;
+              return {
+                contents: await Bun.file(originalPath).text(),
+              };
+            }
+          );
+        },
+      },
+    ],
     directives: [
       {
         name: "use-streaming",
@@ -65,7 +93,6 @@ export default function ReactStreamingPlugin(
         if (master.isResponseSetted()) return;
         const matched = router.match(master.URL.pathname);
         if (!matched) return;
-        console.log("Matched route for streaming:", matched.filePath);
         if (
           !(await directiveToolSingleton.pathIs(
             "use-streaming",
@@ -75,7 +102,9 @@ export default function ReactStreamingPlugin(
           return;
 
         const _module = (await import(
-          matched.filePath + isDev() ? `?v=${Date.now()}` : ""
+          "react-streaming-original-file:" +
+            matched.filePath +
+            (isDev() ? `?v=${Date.now()}` : "")
         )) as { default?: () => JSX.Element | Promise<JSX.Element> };
         if (!_module.default) return;
 
