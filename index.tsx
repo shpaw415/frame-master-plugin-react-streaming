@@ -8,6 +8,7 @@ import {
   type RenderToReadableStreamOptions,
 } from "react-dom/server";
 import { directiveToolSingleton } from "frame-master/plugin";
+import { RequestContext } from "./src/utils";
 
 declare module "frame-master/plugin/utils" {
   interface CustomDirectives {
@@ -17,7 +18,7 @@ declare module "frame-master/plugin/utils" {
 
 export type ReactStreamingPluginOptions = {
   /**
-   * The source directory to scan for 'use-dynamic' directives.
+   * The source directory to scan for 'use-streaming' directives.
    */
   baseSrc: string;
   /**
@@ -109,13 +110,19 @@ export default function ReactStreamingPlugin(
         )) as { default?: () => JSX.Element | Promise<JSX.Element> };
         if (!_module.default) return;
 
+        const WrappedComponent = (
+          <RequestContext.Provider value={master}>
+            <_module.default />
+          </RequestContext.Provider>
+        );
+
         master.setResponse(
           await renderToReadableStream(
             (await options.parseEntryPoint?.(
-              <_module.default />,
+              WrappedComponent,
               master,
               router
-            )) ?? <_module.default />,
+            )) ?? WrappedComponent,
             options.streamingOptions
           ),
           {
