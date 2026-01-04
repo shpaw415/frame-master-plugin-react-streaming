@@ -76,6 +76,7 @@ export default function ReactStreamingPlugin(
                 .at(0)!;
               return {
                 contents: await Bun.file(originalPath).text(),
+                loader: "tsx",
               };
             }
           );
