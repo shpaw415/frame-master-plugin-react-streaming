@@ -70,7 +70,7 @@ export default function ReactStreamingPlugin(
             { filter: /.*/, namespace: "react-streaming-original-file" },
             async (args) => {
               const originalPath = args.path
-                .replace(/^react-streaming-original-file:/, "")
+                .replace("react-streaming-original-file:", "")
                 .split("?v=")
                 .at(0)!;
               return {
