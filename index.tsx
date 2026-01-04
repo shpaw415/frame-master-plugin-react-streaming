@@ -111,11 +111,13 @@ export default function ReactStreamingPlugin(
         )) as { default?: () => JSX.Element | Promise<JSX.Element> };
         if (!_module.default) return;
 
-        const pageElement = await _module.default();
         master.setResponse(
           await renderToReadableStream(
-            (await options.parseEntryPoint?.(pageElement, master, router)) ??
-              pageElement,
+            (await options.parseEntryPoint?.(
+              <_module.default />,
+              master,
+              router
+            )) ?? <_module.default />,
             options.streamingOptions
           ),
           {
