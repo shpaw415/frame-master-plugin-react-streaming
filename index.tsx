@@ -58,8 +58,9 @@ export default function ReactStreamingPlugin(
         name: "react-streaming-runtime-original-file-importer",
         setup(build) {
           build.onResolve(
-            { filter: /^react-streaming-original-file:*/ },
+            { filter: /^react-streaming-original-file:.*/ },
             (args) => {
+              console.log("Resolving original file for:", args.path);
               return {
                 path: args.path,
                 namespace: "react-streaming-original-file",
@@ -69,6 +70,7 @@ export default function ReactStreamingPlugin(
           build.onLoad(
             { filter: /.*/, namespace: "react-streaming-original-file" },
             async (args) => {
+              console.log("Loading original file for:", args.path);
               const originalPath = args.path
                 .replace("react-streaming-original-file:", "")
                 .split("?v=")
