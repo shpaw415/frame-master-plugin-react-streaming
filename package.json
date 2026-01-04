@@ -16,6 +16,6 @@
   },
   "exports": {
     ".": "./index.tsx",
-    "./utils": "./utils.ts"
+    "./utils": "./src/utils.ts"
   }
 }
