@@ -58,7 +58,7 @@ export default function ReactStreamingPlugin(
         name: "react-streaming-runtime-original-file-importer",
         setup(build) {
           build.onResolve(
-            { filter: /^react-streaming-original-file:.*/ },
+            { filter: /^react-streaming-original-file:*/ },
             (args) => {
               return {
                 path: args.path,
