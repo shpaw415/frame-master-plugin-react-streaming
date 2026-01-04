@@ -7,6 +7,7 @@ import {
   renderToReadableStream,
   type RenderToReadableStreamOptions,
 } from "react-dom/server";
+import { directiveToolSingleton } from "frame-master/plugin";
 
 declare module "frame-master/plugin/utils" {
   interface CustomDirectives {
@@ -26,7 +27,8 @@ export type ReactStreamingPluginOptions = {
    */
   parseEntryPoint?: (
     pageElement: JSX.Element,
-    request: masterRequest
+    request: masterRequest,
+    router: Bun.FileSystemRouter
   ) => JSX.Element | Promise<JSX.Element>;
   /**
    * Options to pass to `renderToReadableStream`.
@@ -63,6 +65,15 @@ export default function ReactStreamingPlugin(
         if (master.isResponseSetted()) return;
         const matched = router.match(master.URL.pathname);
         if (!matched) return;
+        console.log("Matched route for streaming:", matched.filePath);
+        if (
+          !(await directiveToolSingleton.pathIs(
+            "use-streaming",
+            matched.filePath
+          ))
+        )
+          return;
+
         const _module = (await import(
           matched.filePath + isDev() ? `?v=${Date.now()}` : ""
         )) as { default?: () => JSX.Element | Promise<JSX.Element> };
@@ -71,13 +82,13 @@ export default function ReactStreamingPlugin(
         const pageElement = await _module.default();
         master.setResponse(
           await renderToReadableStream(
-            (await options.parseEntryPoint?.(pageElement, master)) ??
+            (await options.parseEntryPoint?.(pageElement, master, router)) ??
               pageElement,
             options.streamingOptions
           ),
           {
             headers: {
-              "Content-Type": "text/html; charset=utf-8",
+              "Content-Type": "text/html",
             },
           }
         );
