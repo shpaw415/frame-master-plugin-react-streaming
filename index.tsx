@@ -60,7 +60,6 @@ export default function ReactStreamingPlugin(
           build.onResolve(
             { filter: /\?react-streaming-original-file=.*/ },
             (args) => {
-              console.log("Resolving original file for:", args.path);
               return {
                 path: args.path,
                 namespace: "react-streaming-original-file",
@@ -70,7 +69,6 @@ export default function ReactStreamingPlugin(
           build.onLoad(
             { filter: /.*/, namespace: "react-streaming-original-file" },
             async (args) => {
-              console.log("Loading original file for:", args.path);
               const originalPath = args.path
                 .split("?react-streaming-original-file=")
                 .at(0)!;
